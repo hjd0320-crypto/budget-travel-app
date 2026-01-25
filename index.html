@@ -1,228 +1,365 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budget Travel App - Smart Travel Planner</title>
-    <meta name="description" content="Find the perfect flight and hotel combo within your budget.">
-
-    <script data-noptimize="1" data-cfasync="false" data-wpfc-render="false">
-      (function () {
-          var script = document.createElement("script");
-          script.async = 1;
-          script.src = 'https://emrldtp.com/NDkwMTkw.js?t=490190';
-          document.head.appendChild(script);
-      })();
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-
+    <title>Travel Budget - AI 기반 최저가 여행 플래너</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
     <style>
-        /* 스타일 설정 */
         :root {
-            --primary-color: #0064FF;
-            --text-dark: #1a1a1a;
-            --text-gray: #555;
-            --bg-light: #F9FAFB;
+            --primary: #2563EB; /* 신뢰감을 주는 블루 */
+            --dark: #1E293B;
+            --light: #F8FAFC;
+            --accent: #F59E0B;
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            margin: 0; padding: 0;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background-color: var(--bg-light);
+            background-color: var(--light);
+            color: var(--dark);
             overflow-x: hidden;
         }
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        
-        /* 언어 전환 버튼 스타일 (우측 상단) */
-        .lang-switch-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 2000;
+
+        /* 네비게이션 */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .lang-btn {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.2s;
-        }
-        .lang-btn:hover { background: #f0f0f0; }
-
-        /* 팝업 스타일 */
-        #popup-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000; backdrop-filter: blur(5px);
-        }
-        .popup-content {
-            background: white; padding: 40px 30px; border-radius: 16px;
-            text-align: center; max-width: 400px; width: 85%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: fadeIn 0.3s ease-out;
-        }
-        .close-btn {
-            margin-top: 25px; padding: 12px 30px;
-            background: var(--primary-color); color: white; border: none;
-            border-radius: 8px; cursor: pointer; font-weight: bold;
+            gap: 8px;
         }
 
-        /* 메인 콘텐츠 스타일 */
-        .hero { text-align: center; padding: 100px 20px 80px; background: white; }
-        .hero h1 { font-size: 2.5rem; margin-bottom: 20px; color: #191F28; }
-        .hero p { font-size: 1.2rem; color: var(--text-gray); margin-bottom: 40px; }
-        .cta-button {
-            display: inline-block; background-color: var(--primary-color); color: white;
-            padding: 15px 35px; border-radius: 10px; text-decoration: none; font-weight: bold;
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
-        .features-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px; margin-top: 50px;
-        }
-        .feature-card {
-            padding: 30px; border-radius: 16px; background: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center;
-        }
-        .icon { font-size: 3rem; margin-bottom: 15px; display: block; }
-        footer { text-align: center; padding: 40px; background: #333; color: #aaa; margin-top: 50px; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        /* 히어로 섹션 (메인) */
+        .hero {
+            height: 100vh;
+            min-height: 800px;
+            background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(37,99,235,0.8)), 
+                        url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=2021&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
         
-        /* 한국어 숨김 처리 (기본값) */
-        .ko-text { display: none; }
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        /* 검색 위젯 박스 */
+        .search-widget-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            max-width: 1000px;
+            margin: 0 auto;
+            transform: translateY(30px);
+        }
+
+        /* 파트너 섹션 */
+        .partners {
+            padding: 100px 5% 50px;
+            text-align: center;
+            background: white;
+        }
+
+        .partners p {
+            color: #64748B;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .partner-logos {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            opacity: 0.5;
+            filter: grayscale(100%);
+        }
+
+        .partner-logos span {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #333;
+        }
+
+        /* 특징 섹션 */
+        .features {
+            padding: 100px 5%;
+            background: var(--light);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1);
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #64748B;
+            line-height: 1.6;
+        }
+
+        /* 목업 섹션 */
+        .app-showcase {
+            padding: 100px 5%;
+            background: var(--dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .app-text {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+        }
+
+        .app-text h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item h4 { font-size: 2rem; color: var(--accent); }
+        .stat-item p { opacity: 0.8; }
+
+        /* 푸터 */
+        footer {
+            background: #0F172A;
+            color: #94A3B8;
+            padding: 50px 5%;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-btn { display: none; }
+            .app-showcase { text-align: center; }
+            .stats { justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="lang-switch-container">
-        <button class="lang-btn" onclick="toggleLanguage()">
-            🌐 <span id="lang-label">한국어 보기</span>
-        </button>
-    </div>
+    <nav>
+        <a href="#" class="logo">✈️ TravelBudget</a>
+        <a href="#" class="nav-btn" onclick="alert('앱 심사 진행 중입니다. 곧 출시됩니다!')">App Download</a>
+    </nav>
 
-    <div id="popup-overlay">
-        <div class="popup-content">
-            <div class="en-text">
-                <h3 style="color:#0064FF; margin-top:0;">🚧 Website Under Construction</h3>
-                <p>Welcome to <strong>Budget Travel App</strong>.<br>We are currently updating our website<br>for the official app launch.</p>
-                <p style="font-size: 0.9rem; color: #666;">Click the button below to view the preview.</p>
-                <button class="close-btn" onclick="closePopup()">Enter Site</button>
-            </div>
-            <div class="ko-text">
-                <h3 style="color:#0064FF; margin-top:0;">🚧 홈페이지 리뉴얼 안내</h3>
-                <p><strong>Budget Travel App</strong>을 방문해 주셔서 감사합니다.<br>현재 정식 앱 출시를 위해<br>페이지 개편 작업을 진행 중입니다.</p>
-                <p style="font-size: 0.9rem; color: #666;">아래 버튼을 누르면 미리보기가 가능합니다.</p>
-                <button class="close-btn" onclick="closePopup()">확인 및 입장</button>
-            </div>
-        </div>
-    </div>
-
-    <header class="hero">
-        <div class="container">
-            <div class="en-text">
-                <span style="background:#E8F3FF; color:#0064FF; padding:5px 12px; border-radius:20px; font-size:0.9rem; font-weight:bold;">🚀 Android App Launching Soon</span>
-                <h1>The Perfect Trip<br>Within Your Budget</h1>
-                <p>Simply enter your budget.<br>We find the best Flight + Hotel combos for you.</p>
-                <a href="#" class="cta-button">Pre-register (Coming Soon)</a>
-            </div>
-            <div class="ko-text">
-                <span style="background:#E8F3FF; color:#0064FF; padding:5px 12px; border-radius:20px; font-size:0.9rem; font-weight:bold;">🚀 안드로이드 앱 출시 예정</span>
-                <h1>예산에 딱 맞는<br>완벽한 여행을 찾아드립니다</h1>
-                <p>예산만 입력하세요.<br>항공권부터 숙소까지 최적의 조합을 설계해 드립니다.</p>
-                <a href="#" class="cta-button">출시 알림 받기 (준비중)</a>
-            </div>
-        </div>
-    </header>
-
-    <section class="container">
-        <div class="en-text" style="text-align:center;">
-            <h2>Why Budget Travel App?</h2>
-            <p style="color:#666;">Smart travel planning without the hassle.</p>
-        </div>
-        <div class="ko-text" style="text-align:center;">
-            <h2>주요 기능 소개</h2>
-            <p style="color:#666;">복잡한 검색은 이제 그만, 스마트하게 여행하세요.</p>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <span class="icon">💸</span>
-                <div class="en-text">
-                    <h3>Budget-First Search</h3>
-                    <p>Set your budget slider. We only show destinations you can afford right now.</p>
-                </div>
-                <div class="ko-text">
-                    <h3>예산 맞춤 검색</h3>
-                    <p>슬라이더로 예산을 설정하세요. 내 지갑 사정에 딱 맞는 여행지만 골라드립니다.</p>
-                </div>
-            </div>
-            <div class="feature-card">
-                <span class="icon">✈️🏨</span>
-                <div class="en-text">
-                    <h3>Flight + Hotel Combos</h3>
-                    <p>Real-time analysis of global travel data to find the cheapest bundles.</p>
-                </div>
-                <div class="ko-text">
-                    <h3>항공+숙소 꿀조합</h3>
-                    <p>전 세계 데이터를 실시간 분석하여 최저가 항공과 숙소를 한 번에 찾아냅니다.</p>
-                </div>
-            </div>
-            <div class="feature-card">
-                <span class="icon">🎁</span>
-                <div class="en-text">
-                    <h3>Smart Savings</h3>
-                    <p>Money left over? We recommend tours and activities to maximize your trip.</p>
-                </div>
-                <div class="ko-text">
-                    <h3>남는 돈의 재발견</h3>
-                    <p>예산보다 싸게 예약하셨나요? 남는 잔액으로 즐길 수 있는 투어를 추천합니다.</p>
-                </div>
+    <section class="hero">
+        <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
+            <span class="badge">✨ AI Travel Assistant</span>
+            <h1>여행 비용을 <span style="color:var(--accent)">절반으로</span><br>줄여주는 마법</h1>
+            <p>전 세계 700개 항공사와 아고다, 부킹닷컴의 히든 특가를 찾아드립니다.<br>복잡한 계산은 AI에게 맡기세요.</p>
+            
+            <div class="search-widget-wrapper" data-aos="fade-up" data-aos-delay="200">
+                <script charset="utf-8" src="//www.travelpayouts.com/widgets/7/widget.js?marker=697363&extras=false&template=compact" async></script>
             </div>
         </div>
     </section>
 
+    <section class="partners">
+        <div data-aos="fade-in">
+            <p>Official Partners & Supported Platforms</p>
+            <div class="partner-logos">
+                <span>Trip.com</span>
+                <span>Agoda</span>
+                <span>Booking.com</span>
+                <span>Expedia</span>
+                <span>Skyscanner</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="section-title" data-aos="fade-up">
+            <h2>왜 Travel Budget인가요?</h2>
+            <p>기존 여행 앱들과는 차원이 다른 경험을 제공합니다.</p>
+        </div>
+
+        <div class="grid">
+            <div class="card" data-aos="fade-up" data-aos-delay="100">
+                <span class="icon">🔍</span>
+                <h3>숨겨진 최저가 검색</h3>
+                <p>일반 검색으로는 나오지 않는 '시크릿 특가'를 Aviasales 엔진을 통해 발굴합니다. 남들보다 20% 더 싸게 예약하세요.</p>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-delay="200">
+                <span class="icon">🏨</span>
+                <h3>숙소 + 항공 자동 매칭</h3>
+                <p>비행기 시간에 딱 맞는 최적의 숙소를 추천합니다. 아고다와 부킹닷컴의 평점 8.0 이상 숙소만 골라드립니다.</p>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-delay="300">
+                <span class="icon">🤖</span>
+                <h3>AI 예산 플래너</h3>
+                <p>"100만원으로 어디 갈 수 있어?"라고 물어보세요. 예산에 맞는 여행지와 일정을 AI가 3초 만에 짜드립니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="app-showcase">
+        <div class="app-text" data-aos="fade-right">
+            <h2>내 손안의 여행 비서<br>지금 바로 시작하세요.</h2>
+            <p style="margin-bottom: 30px; opacity: 0.8;">현재 구글 플레이스토어 심사 중입니다. 곧 만나보실 수 있습니다.</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <h4>100+</h4>
+                    <p>Supported Airlines</p>
+                </div>
+                <div class="stat-item">
+                    <h4>$500</h4>
+                    <p>Avg. Savings</p>
+                </div>
+                <div class="stat-item">
+                    <h4>24/7</h4>
+                    <p>AI Support</p>
+                </div>
+            </div>
+        </div>
+        <div class="app-img" data-aos="fade-left">
+            <img src="https://images.unsplash.com/photo-1512428559087-560fa0db79e9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                 alt="App Mockup" 
+                 style="border-radius: 30px; box-shadow: -20px 20px 60px rgba(0,0,0,0.5); max-width: 300px;">
+        </div>
+    </section>
+
     <footer>
-        <p>© 2026 Budget Travel App. All rights reserved.</p>
-        <p style="font-size:0.8rem;">Contact: support@budget-travel-app.com</p>
+        <p>&copy; 2025 Travel Budget. All rights reserved.</p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #555;">
+            Travel Budget is an affiliate partner of TravelPayouts, Agoda, and Trip.com.<br>
+            Marker ID: 697363
+        </p>
     </footer>
 
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // 팝업 닫기
-        function closePopup() {
-            document.getElementById('popup-overlay').style.display = 'none';
-        }
-
-        // 언어 전환 기능
-        let isEnglish = true; // 기본값 영어
-
-        function toggleLanguage() {
-            isEnglish = !isEnglish; // 상태 반전
-
-            const enElements = document.querySelectorAll('.en-text');
-            const koElements = document.querySelectorAll('.ko-text');
-            const btnLabel = document.getElementById('lang-label');
-
-            if (isEnglish) {
-                // 영어 보여주기
-                enElements.forEach(el => el.style.display = 'block');
-                koElements.forEach(el => el.style.display = 'none');
-                btnLabel.innerText = "한국어 보기"; // 버튼 텍스트 변경
-            } else {
-                // 한국어 보여주기
-                enElements.forEach(el => el.style.display = 'none');
-                koElements.forEach(el => el.style.display = 'block');
-                btnLabel.innerText = "Switch to English"; // 버튼 텍스트 변경
-            }
-        }
+        AOS.init({
+            once: true, // 애니메이션 한 번만 실행
+            offset: 100, // 트리거 위치
+            duration: 800 // 지속 시간
+        });
     </script>
-
 </body>
 </html>
